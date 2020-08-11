@@ -29,3 +29,8 @@ zuul:
     company-service:
       path: /api/company/**
       service-id: company-service
+    auth-service: 
+      path: /auth/**
+      service-id: auth-service
+      strip-prefix: false
+      sensitive-headers: Cookie,Set-Cookie
