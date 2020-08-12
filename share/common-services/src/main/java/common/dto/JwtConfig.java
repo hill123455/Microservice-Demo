@@ -1,4 +1,4 @@
-package hitachi.services.auth.config;
+package common.dto;
 
 import org.springframework.beans.factory.annotation.Value;
 
@@ -8,7 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JwtConfig {
-
 	@Value("${security.jwt.uri:/auth/**}")
 	private String Uri;
 

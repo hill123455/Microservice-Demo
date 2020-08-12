@@ -20,12 +20,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import common.dto.JwtConfig;
+import hitachi.services.auth.dto.UserCredentials;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-	// We use auth manager to validate the user credentials
 	private AuthenticationManager authManager;
 
 	private final JwtConfig jwtConfig;
@@ -64,7 +65,8 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
 	// Upon successful authentication, generate a token.
 	// The 'auth' passed to successfulAuthentication() is the current authenticated
-	// user. @Override
+	// user.
+	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
 
@@ -74,32 +76,11 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 				// This is important because it affects the way we get them back in the Gateway.
 				.claim("authorities",
 						auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-				.setIssuedAt(new Date(now)).setExpiration(new Date(now + jwtConfig.getExpiration() * 1000)) // in
-																											// milliseconds
+				.setIssuedAt(new Date(now)).setExpiration(new Date(now + jwtConfig.getExpiration() * 1000)) 
+																										
 				.signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret().getBytes()).compact();
 
 		// Add token to header
 		response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + token);
-	}
-
-	// A (temporary) class just to represent the user credentials
-	private static class UserCredentials {
-		private String username, password;
-
-		public String getUsername() {
-			return username;
-		}
-
-		public void setUsername(String username) {
-			this.username = username;
-		}
-
-		public String getPassword() {
-			return password;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
 	}
 }
