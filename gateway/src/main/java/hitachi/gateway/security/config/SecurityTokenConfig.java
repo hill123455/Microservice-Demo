@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import hitachi.gateway.security.jwt.JwtConfig;
+import common.dto.JwtConfig;
 import hitachi.gateway.security.jwt.JwtTokenAuthenticationFilter;
 
 @EnableWebSecurity
@@ -22,23 +22,12 @@ public class SecurityTokenConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable()
-				// make sure we use stateless session; session won't be used to store user'state.
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-				// handle an authorized attempts
+		http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 				.exceptionHandling()
 				.authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)).and()
-				// Add a filter to validate the tokens with every request
 				.addFilterAfter(new JwtTokenAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
-				// authorization requests config
-				.authorizeRequests()
-				// allow all who are accessing "auth" service
-				.antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll()
-				// must be an admin if trying to access admin area (authentication is also
-				// required here)
-				.antMatchers("/gallery" + "/admin/**").hasRole("ADMIN")
-				// Any other request must be authenticated
-				.anyRequest().authenticated();
+				.authorizeRequests().antMatchers(HttpMethod.POST, jwtConfig.getUri()).permitAll().anyRequest()
+				.authenticated();
 	}
 
 	@Bean

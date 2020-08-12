@@ -17,4 +17,9 @@ public class CompanyController {
 		return userInfo;
 	}
 
+	@GetMapping("/test")
+	public String test() {
+		return "Alor on danse";
+	}
+
 }

@@ -34,5 +34,9 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>hitachi</groupId>
+			<artifactId>common-services</artifactId>
+		</dependency>
 	</dependencies>
 </project>
