@@ -35,7 +35,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 		this.authManager = authManager;
 		this.jwtConfig = jwtConfig;
 
-		// By default, UsernamePasswordAuthenticationFilter listens to "/login" path.
 		// In our case, we use "/auth". So, we need to override the defaults.
 		this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(jwtConfig.getUri(), "POST"));
 	}
@@ -63,21 +62,15 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 		}
 	}
 
-	// Upon successful authentication, generate a token.
-	// The 'auth' passed to successfulAuthentication() is the current authenticated
-	// user.
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
 
 		Long now = System.currentTimeMillis();
 		String token = Jwts.builder().setSubject(auth.getName())
-				// Convert to list of strings.
-				// This is important because it affects the way we get them back in the Gateway.
 				.claim("authorities",
 						auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-				.setIssuedAt(new Date(now)).setExpiration(new Date(now + jwtConfig.getExpiration() * 1000)) 
-																										
+				.setIssuedAt(new Date(now)).setExpiration(new Date(now + jwtConfig.getExpiration() * 1000))
 				.signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret().getBytes()).compact();
 
 		// Add token to header
